@@ -3,11 +3,10 @@
 ![Zotero target](https://img.shields.io/badge/Zotero-7-green?style=flat-square&logo=zotero&logoColor=CC2936)
 ![License](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue?style=flat-square)
 [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
+[![Coding time tracker](https://wakatime.com/badge/github/xinxzk/zotero-wakatime.svg)](https://wakatime.com)
 
 Zotero WakaTime tracks time spent reading PDFs in Zotero and sends reading
 heartbeats to WakaTime.
-
-<img src="img/wakatime-logo-128.png" width="96" height="96" alt="WakaTime logo">
 
 ## Features
 
