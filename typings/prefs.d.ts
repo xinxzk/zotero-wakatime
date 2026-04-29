@@ -12,6 +12,8 @@ declare namespace _ZoteroTypes {
       "defaultProject": string;
       "heartbeatInterval": number;
       "includeTitle": boolean;
+      "showToolbarIcon": boolean;
+      "apiBaseUrl": string;
     };
   }
 }

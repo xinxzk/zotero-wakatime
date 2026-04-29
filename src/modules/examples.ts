@@ -73,7 +73,7 @@ export class BasicExampleFactory {
       pluginID: addon.data.config.addonID,
       src: rootURI + "content/preferences.xhtml",
       label: getString("prefs-title"),
-      image: `chrome://${addon.data.config.addonRef}/content/icons/favicon.png`,
+      image: `chrome://${addon.data.config.addonRef}/content/icons/wakatime-96.png`,
     });
   }
 }
@@ -138,7 +138,7 @@ export class UIExampleFactory {
 
   @example
   static registerRightClickMenuItem() {
-    const menuIcon = `chrome://${addon.data.config.addonRef}/content/icons/favicon@0.5x.png`;
+    const menuIcon = `chrome://${addon.data.config.addonRef}/content/icons/wakatime-48.png`;
     // item menuitem with icon
     ztoolkit.Menu.register("item", {
       tag: "menuitem",
@@ -354,7 +354,7 @@ export class PromptExampleFactory {
     ztoolkit.Prompt.register([
       {
         name: "Normal Command Test",
-        label: "Plugin Template",
+        label: "Zotero WakaTime",
         callback(prompt) {
           ztoolkit.getGlobal("alert")("Command triggered!");
         },
@@ -567,7 +567,7 @@ export class PromptExampleFactory {
     ztoolkit.Prompt.register([
       {
         name: "Conditional Command Test",
-        label: "Plugin Template",
+        label: "Zotero WakaTime",
         // The when function is executed when Prompt UI is woken up by `Shift + P`, and this command does not display when false is returned.
         when: () => {
           const items = ztoolkit.getGlobal("ZoteroPane").getSelectedItems();
@@ -823,11 +823,11 @@ export class HelperExampleFactory {
   static clipboardExample() {
     new ztoolkit.Clipboard()
       .addText(
-        "![Plugin Template](https://github.com/windingwind/zotero-plugin-template)",
+        "![Zotero WakaTime](https://github.com/xinxzk/zotero-wakatime)",
         "text/unicode",
       )
       .addText(
-        '<a href="https://github.com/windingwind/zotero-plugin-template">Plugin Template</a>',
+        '<a href="https://github.com/xinxzk/zotero-wakatime">Zotero WakaTime</a>',
         "text/html",
       )
       .copy();

@@ -1,4 +1,5 @@
 import { getPref, setPref } from "../utils/prefs";
+import pkg from "../../package.json";
 
 declare const PathUtils: {
   join(...parts: string[]): string;
@@ -16,6 +17,14 @@ type WakaTimeHeartbeat = {
   project: string;
 };
 
+type WakaTimeStatusBarResponse = {
+  data?: {
+    grand_total?: {
+      total_seconds?: number;
+    };
+  };
+};
+
 export class WakaTimeClient {
   private apiKey?: string;
   private promptedForMissingKey = false;
@@ -27,19 +36,21 @@ export class WakaTimeClient {
       return;
     }
 
-    const response = await fetch(
-      "https://wakatime.com/api/v1/users/current/heartbeats",
+    const response = await Zotero.HTTP.request(
+      "POST",
+      `${this.getApiBaseUrl()}/users/current/heartbeats`,
       {
-        method: "POST",
         headers: {
           Authorization: `Basic ${btoa(apiKey)}`,
           "Content-Type": "application/json",
+          "User-Agent": this.getUserAgent(),
         },
         body: JSON.stringify(heartbeat),
+        successCodes: false,
       },
     );
 
-    if (!response.ok) {
+    if (response.status < 200 || response.status >= 300) {
       ztoolkit.log("Failed to send WakaTime heartbeat", response.status);
       if (response.status === 401 || response.status === 403) {
         this.apiKey = undefined;
@@ -65,6 +76,43 @@ export class WakaTimeClient {
     }
 
     return undefined;
+  }
+
+  async getTodaySeconds(): Promise<number | undefined> {
+    const apiKey = await this.getApiKey();
+    if (!apiKey) {
+      return undefined;
+    }
+
+    const response = await Zotero.HTTP.request(
+      "GET",
+      `${this.getApiBaseUrl()}/users/current/status_bar/today`,
+      {
+        headers: {
+          Authorization: `Basic ${btoa(apiKey)}`,
+          "User-Agent": this.getUserAgent(),
+        },
+        successCodes: false,
+      },
+    );
+
+    if (response.status < 200 || response.status >= 300) {
+      ztoolkit.log("Failed to fetch WakaTime status bar", response.status);
+      if (response.status === 401 || response.status === 403) {
+        this.apiKey = undefined;
+      }
+      return undefined;
+    }
+
+    try {
+      const payload = JSON.parse(
+        response.responseText || "{}",
+      ) as WakaTimeStatusBarResponse;
+      return payload.data?.grand_total?.total_seconds;
+    } catch (e) {
+      ztoolkit.log("Unable to parse WakaTime status bar response", e);
+      return undefined;
+    }
   }
 
   async promptForApiKey(): Promise<void> {
@@ -124,5 +172,27 @@ export class WakaTimeClient {
       }
     }
     return undefined;
+  }
+
+  private getUserAgent(): string {
+    const os = this.getOperatingSystem();
+    return `wakatime/unset (${os}) zotero-wakatime/${pkg.version}`;
+  }
+
+  private getApiBaseUrl(): string {
+    const fallback = "https://api.wakatime.com/api/v1";
+    const apiBaseUrl = `${getPref("apiBaseUrl") || fallback}`.trim();
+    return (apiBaseUrl || fallback).replace(/\/+$/, "");
+  }
+
+  private getOperatingSystem(): string {
+    try {
+      const os = Services.appinfo.OS || "unknown";
+      const arch = Services.appinfo.XPCOMABI?.split("-").pop() || "unknown";
+      return `${os.toLowerCase()}-${arch.toLowerCase()}`;
+    } catch (e) {
+      ztoolkit.log("Unable to resolve operating system", e);
+      return "unknown";
+    }
   }
 }

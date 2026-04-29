@@ -2,23 +2,23 @@
   "name": "zotero-wakatime",
   "type": "module",
   "version": "3.1.0",
-  "description": "Track Zotero reading time with WakaTime",
+  "description": "Track Zotero PDF reading time with WakaTime",
   "config": {
     "addonName": "Zotero WakaTime",
-    "addonID": "zotero-wakatime@example.com",
+    "addonID": "zotero-wakatime@xinxzk.github.io",
     "addonRef": "zoterowakatime",
     "addonInstance": "ZoteroWakaTime",
     "prefsPrefix": "extensions.zotero.zoterowakatime"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windingwind/zotero-plugin-template.git"
+    "url": "git+https://github.com/xinxzk/zotero-wakatime.git"
   },
-  "author": "windingwind",
+  "author": "xinxzk",
   "bugs": {
-    "url": "https://github.com/windingwind/zotero-plugin-template/issues"
+    "url": "https://github.com/xinxzk/zotero-wakatime/issues"
   },
-  "homepage": "https://github.com/windingwind/zotero-plugin-template#readme",
+  "homepage": "https://github.com/xinxzk/zotero-wakatime#readme",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "zotero-plugin serve",
