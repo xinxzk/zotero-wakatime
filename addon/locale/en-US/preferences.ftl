@@ -1,5 +1,9 @@
-pref-title = Addon Template Example
+pref-title = WakaTime Reading Tracker
 pref-enable =
     .label = Enable
-pref-input = Input
+pref-api-key = API key fallback
+pref-default-project = Default project
+pref-heartbeat-interval = Heartbeat interval seconds
+pref-include-title =
+    .label = Use paper title as entity
 pref-help = { $name } Build { $version } { $time }

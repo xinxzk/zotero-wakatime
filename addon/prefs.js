@@ -1,2 +1,5 @@
 pref("enable", true);
-pref("input", "This is input");
+pref("apiKey", "");
+pref("defaultProject", "Zotero Reading");
+pref("heartbeatInterval", 120);
+pref("includeTitle", true);

@@ -1,5 +1,9 @@
-pref-title = 插件模板设置示例
+pref-title = WakaTime 阅读统计
 pref-enable =
     .label = 开启
-pref-input = 输入
+pref-api-key = API Key 备用值
+pref-default-project = 默认项目
+pref-heartbeat-interval = 心跳间隔（秒）
+pref-include-title =
+    .label = 使用文献标题作为 entity
 pref-help = { $name } Build { $version } { $time }

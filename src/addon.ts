@@ -1,6 +1,7 @@
 import { config } from "../package.json";
 import { ColumnOptions, DialogHelper } from "zotero-plugin-toolkit";
 import hooks from "./hooks";
+import type { ReadingTracker } from "./modules/readingTracker";
 import { createZToolkit } from "./utils/ztoolkit";
 
 class Addon {
@@ -10,6 +11,8 @@ class Addon {
     // Env type, see build.js
     env: "development" | "production";
     initialized?: boolean;
+    notifierID?: string;
+    tracker?: ReadingTracker;
     ztoolkit: ZToolkit;
     locale?: {
       current: any;
