@@ -239,14 +239,15 @@ function findToolbarContainer(doc: Document): Element | undefined {
 }
 
 function createToolbarButton(doc: Document): Element {
-  const button = (
-    (doc as any).createXULElement?.("toolbarbutton") ??
-    doc.createElement("toolbarbutton")
-  ) as Element;
+  const button = ((doc as any).createXULElement?.("toolbarbutton") ??
+    doc.createElement("toolbarbutton")) as Element;
   const iconURI = `chrome://${addon.data.config.addonRef}/content/icons/wakatime-128.png`;
 
   button.setAttribute("id", TOOLBAR_BUTTON_ID);
-  button.setAttribute("class", "toolbarbutton-1 chromeclass-toolbar-additional");
+  button.setAttribute(
+    "class",
+    "toolbarbutton-1 chromeclass-toolbar-additional",
+  );
   button.setAttribute("image", iconURI);
   button.setAttribute(
     "style",

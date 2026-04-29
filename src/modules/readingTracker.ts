@@ -59,9 +59,12 @@ export class ReadingTracker {
     if (this.statusBarTimerID !== undefined) {
       clearInterval(this.statusBarTimerID);
     }
-    this.statusBarTimerID = setInterval(() => {
-      void this.refreshTodaySeconds();
-    }, 5 * 60 * 1000) as unknown as number;
+    this.statusBarTimerID = setInterval(
+      () => {
+        void this.refreshTodaySeconds();
+      },
+      5 * 60 * 1000,
+    ) as unknown as number;
   }
 
   stopStatusBarSync(): void {
