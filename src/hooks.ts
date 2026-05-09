@@ -270,7 +270,7 @@ function createToolbarButton(doc: Document): Element {
 
 function updateToolbarButton(button: Element): void {
   const label = formatReadingTime(addon.data.tracker?.getReadingSeconds() ?? 0);
-  button.setAttribute("label", label);
+  (button as Element & { label?: string }).label = label;
   button.setAttribute("tooltiptext", "Open WakaTime dashboard");
 }
 
