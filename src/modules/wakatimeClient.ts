@@ -6,6 +6,12 @@ declare const PathUtils: {
 };
 
 declare const IOUtils: {
+  createUniqueFile(
+    parent: string,
+    prefix: string,
+    permissions?: number,
+  ): Promise<string>;
+  remove(path: string): Promise<void>;
   readUTF8(path: string): Promise<string>;
 };
 
@@ -15,6 +21,7 @@ type WakaTimeHeartbeat = {
   category: "researching";
   time: number;
   project: string;
+  hostname?: string;
 };
 
 type WakaTimeStatusBarResponse = {
@@ -27,6 +34,8 @@ type WakaTimeStatusBarResponse = {
 
 export class WakaTimeClient {
   private apiKey?: string;
+  private hostname?: string;
+  private hostnamePromise?: Promise<string | undefined>;
   private promptedForMissingKey = false;
 
   async sendHeartbeat(heartbeat: WakaTimeHeartbeat): Promise<void> {
@@ -35,6 +44,9 @@ export class WakaTimeClient {
       await this.promptForApiKey();
       return;
     }
+
+    const hostname = await this.getHostname();
+    const payload = hostname ? { ...heartbeat, hostname } : heartbeat;
 
     const response = await Zotero.HTTP.request(
       "POST",
@@ -45,7 +57,7 @@ export class WakaTimeClient {
           "Content-Type": "application/json",
           "User-Agent": this.getUserAgent(),
         },
-        body: JSON.stringify(heartbeat),
+        body: JSON.stringify(payload),
         successCodes: false,
       },
     );
@@ -194,5 +206,102 @@ export class WakaTimeClient {
       ztoolkit.log("Unable to resolve operating system", e);
       return "unknown";
     }
+  }
+
+  private async getHostname(): Promise<string | undefined> {
+    if (this.hostname) {
+      return this.hostname;
+    }
+
+    if (!this.hostnamePromise) {
+      this.hostnamePromise = this.resolveHostname();
+    }
+
+    this.hostname = await this.hostnamePromise;
+    return this.hostname;
+  }
+
+  private async resolveHostname(): Promise<string | undefined> {
+    const envHostname = this.getHostnameFromEnvironment();
+    if (envHostname) {
+      return envHostname;
+    }
+
+    return this.getHostnameFromSystemCommand();
+  }
+
+  private getHostnameFromEnvironment(): string | undefined {
+    for (const key of ["WAKATIME_HOSTNAME", "HOSTNAME", "COMPUTERNAME"]) {
+      try {
+        const hostname = this.normalizeHostname(Services.env.get(key));
+        if (hostname) {
+          return hostname;
+        }
+      } catch (e) {
+        ztoolkit.log(`Unable to read ${key} environment variable`, e);
+      }
+    }
+    return undefined;
+  }
+
+  private async getHostnameFromSystemCommand(): Promise<string | undefined> {
+    const command = this.getHostnameCommand();
+    if (!command) {
+      return undefined;
+    }
+
+    let outputPath: string | undefined;
+    try {
+      const tempDir = Services.dirsvc.get(
+        "TmpD",
+        Components.interfaces.nsIFile,
+      ) as nsIFile;
+      outputPath = await IOUtils.createUniqueFile(
+        tempDir.path,
+        "zotero-wakatime-hostname",
+      );
+
+      const result = await Zotero.Utilities.Internal.exec(command, [
+        "-c",
+        `hostname > ${this.shellQuote(outputPath)}`,
+      ]);
+      if (result !== true) {
+        ztoolkit.log("Unable to resolve hostname", result);
+        return undefined;
+      }
+
+      return this.normalizeHostname(await IOUtils.readUTF8(outputPath));
+    } catch (e) {
+      ztoolkit.log("Unable to resolve hostname", e);
+      return undefined;
+    } finally {
+      if (outputPath) {
+        try {
+          await IOUtils.remove(outputPath);
+        } catch (_e) {
+          // Best-effort cleanup only.
+        }
+      }
+    }
+  }
+
+  private getHostnameCommand(): string | undefined {
+    const os = Services.appinfo.OS;
+    if (os === "WINNT") {
+      return undefined;
+    }
+    return "/bin/sh";
+  }
+
+  private normalizeHostname(hostname: string | undefined): string | undefined {
+    const normalized = hostname?.trim();
+    if (!normalized || normalized.toLowerCase() === "unknown") {
+      return undefined;
+    }
+    return normalized;
+  }
+
+  private shellQuote(value: string): string {
+    return `'${value.replace(/'/g, "'\\''")}'`;
   }
 }
